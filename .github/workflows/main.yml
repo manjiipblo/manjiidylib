@@ -8,28 +8,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Theos & SDK
+      - name: Setup Theos
         run: |
-          # Install Theos secara manual agar lebih stabil di GitHub
-          git clone --recursive https://github.com/theos/theos.git ~/theos
-          
-          # Download SDK iOS 16.5
+          sudo git clone --recursive https://github.com/theos/theos.git /opt/theos
+          sudo chown -R $USER /opt/theos
           curl -LO https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.tar.xz
-          
-          # Buat folder sdks dan ekstrak filenya
-          mkdir -p ~/theos/sdks
-          tar -xvf iPhoneOS16.5.sdk.tar.xz -C ~/theos/sdks
-          
-          # Hapus file tar agar bersih
+          mkdir -p /opt/theos/sdks
+          tar -xvf iPhoneOS16.5.sdk.tar.xz -C /opt/theos/sdks
           rm iPhoneOS16.5.sdk.tar.xz
 
       - name: Build Dylib
         run: |
-          export THEOS=~/theos
-          # Jalankan perintah pembersihan dulu sebelum masak
-          make clean
+          export THEOS=/opt/theos
           make package
-
+        
       - name: Upload Result
         uses: actions/upload-artifact@v4
         with:
