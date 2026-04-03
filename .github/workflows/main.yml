@@ -1,4 +1,4 @@
-name: Build Manjii Dylib
+name: Build Manjii Dylib Final
 on: [push, workflow_dispatch]
 
 jobs:
@@ -8,27 +8,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Environment
+      - name: Pasang Dapur Theos
         run: |
-          # Pasang Theos di folder sistem agar tidak "No such file" lagi
-          sudo git clone --recursive https://github.com/theos/theos.git /opt/theos
-          sudo chown -R $USER /opt/theos
+          # Install Theos otomatis
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
           
-          # Download SDK iOS 16.5 yang fresh
-          curl -L https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.tar.xz -o sdk.tar.xz
-          mkdir -p /opt/theos/sdks
-          tar -xf sdk.tar.xz -C /opt/theos/sdks
-          rm sdk.tar.xz
+          # Ambil bumbu SDK 16.5
+          curl -LO https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.tar.xz
+          mkdir -p ~/theos/sdks
+          tar -xf iPhoneOS16.5.sdk.tar.xz -C ~/theos/sdks
 
-      - name: Memasak Dylib
+      - name: Masak Menu Manjii
         run: |
-          export THEOS=/opt/theos
-          # Bersihkan sisa error sebelumnya lalu build ulang
+          export THEOS=~/theos
+          # Kita paksa build meskipun ada file lama yang nyangkut
           make clean
-          make package
-        
-      - name: Kirim Hasil ke Manjii
+          make package FINALPACKAGE=1
+
+      - name: Kirim Hasil ke HP Manjii
         uses: actions/upload-artifact@v4
         with:
-          name: ManjiiDylib-Final
+          name: Menu-Manjii-iOS18
           path: packages/*.deb
