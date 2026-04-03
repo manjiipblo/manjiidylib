@@ -1,0 +1,28 @@
+name: Build Manjii Dylib
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Theos
+        run: |
+          export THEOS=~/theos
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
+          curl -LO https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.tar.xz
+          mkdir -p $THEOS/sdks
+          tar -xvf iPhoneOS16.5.sdk.tar.xz -C $THEOS/sdks
+
+      - name: Build Dylib
+        run: |
+          export THEOS=~/theos
+          make package
+
+      - name: Upload Result
+        uses: actions/upload-artifact@v4
+        with:
+          name: ManjiiDylib-iOS18
+          path: packages/*.deb
