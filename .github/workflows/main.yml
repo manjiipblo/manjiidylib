@@ -8,22 +8,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Theos
+      - name: Setup Environment
         run: |
+          # Pasang Theos di folder sistem agar tidak "No such file" lagi
           sudo git clone --recursive https://github.com/theos/theos.git /opt/theos
           sudo chown -R $USER /opt/theos
-          curl -LO https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.tar.xz
+          
+          # Download SDK iOS 16.5 yang fresh
+          curl -L https://github.com/theos/sdks/raw/master/iPhoneOS16.5.sdk.tar.xz -o sdk.tar.xz
           mkdir -p /opt/theos/sdks
-          tar -xvf iPhoneOS16.5.sdk.tar.xz -C /opt/theos/sdks
-          rm iPhoneOS16.5.sdk.tar.xz
+          tar -xf sdk.tar.xz -C /opt/theos/sdks
+          rm sdk.tar.xz
 
-      - name: Build Dylib
+      - name: Memasak Dylib
         run: |
           export THEOS=/opt/theos
+          # Bersihkan sisa error sebelumnya lalu build ulang
+          make clean
           make package
         
-      - name: Upload Result
+      - name: Kirim Hasil ke Manjii
         uses: actions/upload-artifact@v4
         with:
-          name: ManjiiDylib-iOS18
+          name: ManjiiDylib-Final
           path: packages/*.deb
